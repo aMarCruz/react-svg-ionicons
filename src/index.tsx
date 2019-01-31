@@ -9,23 +9,27 @@ type Merge<T> = { [K in keyof T]: T[K] }
 
 type IonConf = {
   map: IconMap,
-  def: IonIconDefs,
-  sz: Dict<string>,
-}
-
-/*
-  https://developer.mozilla.org/en-US/docs/Web/API/NavigatorID/platform
-*/
-const isMacLike = /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform)
-
-const keyArray = Object.keys as <T>(obj: T) => (keyof T)[]
-
-const isObject = function (obj: any) {
-  return !!obj && typeof obj === 'object'
+  defs: IonIconDefs,
+  sizes: Dict<string>,
 }
 
 /**
- * Simple Object.assign-like function
+ * We are running in a Mac-like OS?
+ */
+const isMacLike = /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform)
+
+/**
+ * Shorthand to `Object.keys` that returns a more-sense type.
+ */
+const keyArray = Object.keys as <T>(obj: T) => (keyof T)[]
+
+/**
+ * Check if `obj` is a non-falsy object.
+ */
+const isObject = (obj: any) => !!obj && typeof obj === 'object'
+
+/**
+ * Simple `Object.assign`-like function
  */
 const assign = function<T extends Dict, U extends Dict> (dest: T, src: U) {
   if (src) {
@@ -34,6 +38,18 @@ const assign = function<T extends Dict, U extends Dict> (dest: T, src: U) {
     })
   }
   return dest as Merge<T & U>
+}
+
+/**
+ * Remove the `null` or `undefined` properties of an object.
+ */
+const pack = <T extends Dict> (obj: T) => {
+  keyArray(obj).forEach((k) => {
+    if (obj[k] == null) {
+      delete obj[k]
+    }
+  })
+  return obj
 }
 
 /**
@@ -52,13 +68,13 @@ const classAsStr = function (klass: string | string[]) {
  */
 const _Conf: IonConf = {
   map: {},
-  def: {
+  defs: {
     display: 'inline-block',
     fill: 'currentColor',
     stroke: 'currentColor',
     size: 'regular',
   },
-  sz: {
+  sizes: {
     small: '0.75em',
     regular: '1em',
     large: '1.25em',
@@ -68,11 +84,11 @@ const _Conf: IonConf = {
 }
 
 /**
- * Adds the given icons, without remove the existents.
+ * Adds the given icons, without remove the existent ones.
  */
 export const addIcons = function (iconMap: IconMap) {
   invariant(isObject(iconMap), 'The iconMap must be an object.')
-  assign(_Conf.map, iconMap)
+  pack(assign(_Conf.map, iconMap))
 }
 
 /**
@@ -81,10 +97,10 @@ export const addIcons = function (iconMap: IconMap) {
  */
 export const setDefaults = function (defaults: IonIconDefs) {
   if (defaults === null) {
-    _Conf.def = {}
+    _Conf.defs = {}
   } else {
     invariant(isObject(defaults), 'The defaults must be an object.')
-    const defs = assign(_Conf.def, deepClone(defaults))
+    const defs = assign(_Conf.defs, deepClone(defaults))
 
     // check and format class names, if any
     if (defs.className) {
@@ -95,20 +111,16 @@ export const setDefaults = function (defaults: IonIconDefs) {
     if (!defs.className) {
       delete defs.className
     }
-    keyArray(defs).forEach((k) => {
-      if (defs[k] == null) {
-        delete defs[k]
-      }
-    })
+    pack(defs)
   }
 }
 
 /**
  * Reset the table of named sizes. You can extend this.
  */
-export const setSizes = function (sizes: Partial<IonIconSizes>) {
+export const setSizes = function (sizes: string[]) {
   invariant(isObject(sizes), 'The sizes must be an object.')
-  assign(_Conf.sz, sizes)
+  pack(assign(_Conf.sizes, sizes))
 }
 
 /**
@@ -129,7 +141,7 @@ export class IonIcon extends React.PureComponent<IonIconProps> {
    * the classes and styles of both.
    */
   mergeDefs(props: IonIconProps) {
-    const defs = _Conf.def
+    const defs = _Conf.defs
     const keys = keyArray(defs)
 
     for (let i = 0; i < keys.length; i++) {
@@ -184,7 +196,7 @@ export class IonIcon extends React.PureComponent<IonIconProps> {
     const size = opts.size
     if (size != null) {
       delete opts.size
-      opts.width = opts.height = typeof size === 'string' && _Conf.sz[size] || size
+      opts.width = opts.height = typeof size === 'string' && _Conf.sizes[size] || size
     }
 
     // Guess whether the "iOS" style should be used with double-style icons.
