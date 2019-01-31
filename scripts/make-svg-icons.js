@@ -7,6 +7,9 @@ const REP_TAG = PREFIX.slice(0, -1) + ' {...props}>'
 const IDX_IOS = 0
 const IDX_MD  = 1
 
+// Valid ionicon prefixes
+const ICON_PREFIXES = ['ios', 'md', 'logo']
+
 const IONICONS = `${ROOT_DIR}/node_modules/ionicons/dist/collection/icon/svg`
 const DIST_DIR = `${ROOT_DIR}/bundle`
 const ICON_DIR = `${ROOT_DIR}/icon`
@@ -154,34 +157,28 @@ const readTags = (inDir) => {
   const list = fs.readdirSync(inDir, 'utf8')
   let count = 0
   inDir += '/'
-  console.log('Reading source files...')
 
-  list.forEach((file) => {
-    if (!file.endsWith('.svg')) {
+  list.filter((file) => file.endsWith('.svg')).forEach((file) => {
+    let name = file.slice(0, -4) // remove extension
+
+    // First two are the 'ios' and 'md' prefixes
+    const idx = ICON_PREFIXES.indexOf(name.split('-').shift())
+    if (idx < 0) {
+      console.log(`Ignored: ${file}`)
       return
     }
 
-    let name = file.slice(0, -4) // remove extension
     file = inDir + file
     count++
 
-    if (name.startsWith('logo-')) {
+    if (idx >= 2) {
       info[name] = parseSvg(file)
 
     } else {
-      const idx = name.startsWith('ios-')
-        ? IDX_IOS : name.startsWith('md-') ? IDX_MD : -1
-
-      if (idx === -1) {
-        console.log(`Ignored: ${file.split(/[\/\\]/).pop()}`)
-        count--
-
-      } else {
-        name = name.substr(name.indexOf('-') + 1)
-        // @ts-ignore
-        const elem = info[name] || (info[name] = [])
-        elem[idx] = parseSvg(file)
-      }
+      name = name.substr(name.indexOf('-') + 1)
+      // @ts-ignore
+      const elem = info[name] || (info[name] = [])
+      elem[idx] = parseSvg(file)
     }
   })
 

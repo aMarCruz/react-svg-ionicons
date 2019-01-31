@@ -2,6 +2,10 @@
 
 ## \[Unreleased]
 
+### Added
+
+- Add ESLint and fix minor linting issues.
+
 ### Changed
 
 - Optimize icon type detection (iOS/MD).
