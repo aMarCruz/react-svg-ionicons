@@ -5,6 +5,7 @@
 ### Changed
 
 - Optimize icon type detection (iOS/MD).
+- Optimize logic for merging user props with defaults.
 
 ## \[0.1.4] - 2019-01-31
 
