@@ -113,16 +113,6 @@ export class IonIcon extends React.PureComponent<IonIconProps> {
     innerRef: PropTypes.func,
   }
 
-  /**
-   * Determina si se debe usar el icono "ios".
-   *
-   * Si el icono es "logo" devuelve `true`, pero en este caso no importa
-   * el valor devuelto, los iconos "logo" lo ignoran.
-   */
-  ios(name: string, type?: string) {
-    return name.lastIndexOf('logo-', 0) === 0 || type === 'ios' || isMacLike
-  }
-
   mergeProps(props: IonIconProps) {
     const dest = deepClone(_Conf.def)
 
@@ -156,9 +146,6 @@ export class IonIcon extends React.PureComponent<IonIconProps> {
     const renderIcon = _Conf.map[name]!
     invariant(renderIcon, `The icon "${name}" is not registered.`)
 
-    const ios = this.ios(name, opts.iconType)
-    delete opts.iconType
-
     const innerRef = opts.innerRef
     if (innerRef !== null) {
       delete opts.innerRef
@@ -175,6 +162,13 @@ export class IonIcon extends React.PureComponent<IonIconProps> {
     if (size != null) {
       delete opts.size
       opts.width = opts.height = typeof size === 'string' && _Conf.sz[size] || size
+    }
+
+    // Guess whether the "iOS" style should be used with double-style icons.
+    let ios = isMacLike
+    if (opts.iconType) {
+      ios = opts.iconType === 'ios'
+      delete opts.iconType
     }
 
     return renderIcon(opts, ios)
