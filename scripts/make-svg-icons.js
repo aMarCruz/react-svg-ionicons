@@ -11,11 +11,11 @@ const IDX_MD  = 1
 const ICON_PREFIXES = ['ios', 'md', 'logo']
 
 const IONICONS = `${ROOT_DIR}/node_modules/ionicons/dist/collection/icon/svg`
-const DIST_DIR = `${ROOT_DIR}/bundle`
-const ICON_DIR = `${ROOT_DIR}/icon`
+const DIST_DIR = `${ROOT_DIR}/bundles`
+const ICON_DIR = `${ROOT_DIR}/icons`
 
-ensurePath('bundle')
-ensurePath('icon')
+ensurePath('bundles')
+ensurePath('icons')
 
 /**
  * @typedef {{ [k: string]: string | [string, string] }} SvgPathInfo
@@ -31,7 +31,7 @@ const distWrite = (name, content) =>
   fs.writeFileSync(`${DIST_DIR}/${name}`, content, 'utf8')
 
 /**
- * Write the content to a file into the "icon" folder
+ * Write the content to a file into the "icons" folder
  * @param {string} name
  * @param {string} content
  */
@@ -109,7 +109,7 @@ const makeTypings = (names) => {
 const makeBundle = (name, icons, filter) => {
   icons = icons.filter(filter)
 
-  const exp = icons.map((e) => `  '${e}': require('../icon/${e}').default,`).join('\n')
+  const exp = icons.map((e) => `  '${e}': require('../icons/${e}').default,`).join('\n')
   const dts = icons.map((e) => `  '${e}': SVGIcon`).join('\n')
 
   const text = `"use strict";

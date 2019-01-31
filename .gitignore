@@ -12,6 +12,6 @@
 /build
 /coverage
 /node_modules
-/bundle
-/icon
+/bundles
+/icons
 ~*
