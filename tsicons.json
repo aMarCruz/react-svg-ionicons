@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "commonjs",
+    "jsx": "react",
+    "outDir": "./icon",
+    "strict": true,
+    "moduleResolution": "node"
+  },
+  "include": [
+    "icon/*.tsx"
+  ],
+  "exclude": [
+    "node_modules",
+    "scripts"
+  ]
+}

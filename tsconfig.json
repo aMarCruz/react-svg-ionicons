@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "module": "commonjs",
+    "jsx": "react",
+    "outDir": "./",
+    "strict": true,
+    "moduleResolution": "node"
+  },
+  "files": [
+    "src/index.tsx"
+  ],
+  "exclude": [
+    "node_modules",
+    "scripts"
+  ]
+}

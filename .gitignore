@@ -1,0 +1,17 @@
+.DS_Store
+.env.development.local
+.env.local
+.env.production.local
+.env.test.local
+.pnp.js
+.vscode
+*.bak
+*.log
+*.tgz
+/.pnp
+/build
+/coverage
+/node_modules
+/bundle
+/icon
+~*
