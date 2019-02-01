@@ -101,7 +101,7 @@ const makeTypings = (names, count) => {
     'ionicon-version': getPackageVersion(IONICONS),
     'dual-icons': count[0],
     'logo-icons': count[1],
-    'date': formatDate(),
+    'date': new Date().toJSON().substr(0, 19) + 'Z',
   }
   const text = fs.readFileSync(`${__dirname}/index.d.ts.template`, 'utf8')
     .replace(/@\{([-a-z]+)\}/g, (match, name) => data[name] || match)
