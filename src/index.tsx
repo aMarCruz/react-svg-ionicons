@@ -13,6 +13,8 @@ type IonConf = {
   sizes: IonIconSizes,
 }
 
+const UNDEF = undefined
+
 /**
  * We are running in a Mac-like OS?
  */
@@ -107,7 +109,7 @@ export const setDefaults = function (defaults: Nullable<IonIconDefs>) {
 
   // check and format class names, if any
   if (defs.className) {
-    defs.className = classAsStr(defs.className).trim() || undefined
+    defs.className = classAsStr(defs.className).trim() || UNDEF
   }
 
   // cleanup empty properties
@@ -127,6 +129,11 @@ export const setSizes = function (sizes: Nullable<IonIconSizes>) {
   pack(assign(_Conf.sizes, sizes))
 }
 
+const expandFrom = {
+  color: ['fill', 'stroke'],
+  size: ['width', 'height'],
+}
+
 /**
  * Renders a SVG Ionicon
  */
@@ -140,6 +147,17 @@ export class IonIcon extends React.PureComponent<IonIconProps> {
     innerRef: PropTypes.func,
   }
 
+  expandAttr(opts: Dict, name: keyof typeof expandFrom, value: any) {
+    const [p1, p2] = expandFrom[name]
+
+    if (opts[p1] !== UNDEF) {
+      opts[p1] = value
+    }
+    if (opts[p2] !== UNDEF) {
+      opts[p2] = value
+    }
+  }
+
   /**
    * Merge the user properties with the defaults, taking care to preserve
    * the classes and styles of both.
@@ -147,6 +165,17 @@ export class IonIcon extends React.PureComponent<IonIconProps> {
   mergeDefs(props: IonIconProps) {
     const defs = _Conf.defs
     const keys = keyArray(defs)
+
+    // Example of precedence [fill, stroke] = troke:
+    // fill = user.fill -> defs.fill -> user.color -> defs.color
+    // even if any of them is `null`, it will overrite.
+
+    if (props.color !== UNDEF) {
+      this.expandAttr(props, 'color', props.color)
+    }
+    if (props.size !== UNDEF) {
+      this.expandAttr(props, 'size', props.size)
+    }
 
     for (let i = 0; i < keys.length; i++) {
       const k = keys[i]
@@ -162,6 +191,11 @@ export class IonIcon extends React.PureComponent<IonIconProps> {
           props.style = props.style
             ? assign(assign({}, props.style), defs.style!)
             : defs.style
+          break
+
+        case 'color':
+        case 'size':
+          this.expandAttr(props, k, defs[k])
           break
 
         default:
@@ -190,18 +224,6 @@ export class IonIcon extends React.PureComponent<IonIconProps> {
 
     // name & innerRef are out, merge with defaults before color & size
     this.mergeDefs(opts)
-
-    const color = opts.color
-    if (color != null) {
-      delete opts.color
-      opts.fill = opts.stroke = color
-    }
-
-    const size = opts.size
-    if (size != null) {
-      delete opts.size
-      opts.width = opts.height = typeof size === 'string' && _Conf.sizes[size] || size
-    }
 
     // Guess whether the "iOS" style should be used with double-style icons.
     let ios = isMacLike

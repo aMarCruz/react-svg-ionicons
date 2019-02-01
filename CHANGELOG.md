@@ -16,6 +16,7 @@
 - Change the property `iconType` to `mode`, for consistency with the ion-icon web-component.
 - Remove the `IonIconSizes` interface as `setSizes` will accept any names, now the predefined ones are "small" (18px) and "large" (32px), consistent with the ion-icon web-component.
 - Allow to pass `null` to remove properties in addIcons, setDefaults, and setSizes.
+- Give lowest precedence to default color and sizes.
 
 ## \[0.1.4] - 2019-01-31
 
