@@ -2,6 +2,10 @@
 
 ## \[Unreleased]
 
+### Changed
+
+- Update Readme.
+
 ### Fixed
 
 - The propType `iconType` must be `mode`.
@@ -18,9 +22,9 @@
 - Optimize icon type detection (iOS/MD).
 - Optimize logic for merging user props with defaults.
 - Minor refactorization to the main component, more comments.
-- Change folder names "bundle" and "icon" to "bundles" and "icons", for consistency with the ion-icon web-component.
+- Change folder names "bundle" and "icon" to "bundles" and "icons", for consistency with the ion-icon Web Component.
 - Change the property `iconType` to `mode`, for consistency with the ion-icon web-component.
-- Remove the `IonIconSizes` interface as `setSizes` will accept any names, now the predefined ones are "small" (18px) and "large" (32px), consistent with the ion-icon web-component.
+- Remove the `IonIconSizes` interface as `setSizes` will accept any names, now the predefined ones are "small" (18px) and "large" (32px), consistent with the ion-icon Web Component.
 - Allow to pass `null` to remove properties in addIcons, setDefaults, and setSizes.
 - Give lowest precedence to default color and sizes.
 

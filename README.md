@@ -37,9 +37,7 @@ I include three convenience bundles in the folder "bundles":
 - generic : All the dual icons.
 - logos : Only the "logo" icons.
 
-But you can create your own by importing individual icons from the folder "icons".
-
-```js
+```ts
 import { IonIcon, addIcons } from 'react-svg-ionicons'
 import bundle from 'react-svg-ionicons/bundles/all'
 
@@ -49,6 +47,8 @@ addIcons(bundle)
 // From here, you can use the loaded icons anywhere in your App
 <IonIcon name="heart" size="large" color="red" strokeWidth={3} />
 ```
+
+But you can create your own by importing individual icons from the folder "icons".
 
 In addition to the styles and classes that you define (applied to the `<svg>` tag), each icon has an internal `className` formed with the prefix "ion-" and the name of the icon. For example, the "apps" icon has the class name "ion-apps". This allows control of each icon using specific CSS rules, the recommended way to stylize and transform svg the elements.
 
@@ -74,7 +74,7 @@ IonIcon accepts almost any valid SVG attribute in (react) _camel-case_ notation,
 
 - **size**
 
-  String, number, or [named size](#named-sizes) applied to the `width` and `height` attributes ().
+  String, number, or [named size](#named-sizes) applied to the `width` and `height` attributes.
 
   The predefined value is "1rem", but you can change or remove it with [setDefaults](#setdefaults).
 
@@ -88,7 +88,7 @@ IonIcon accepts almost any valid SVG attribute in (react) _camel-case_ notation,
 
 - **innerRef**
 
-  A [`React.ref`](https://reactjs.org/docs/refs-and-the-dom.html) to the inner `svg` element (don't use strings).
+  A [`React.ref`](https://reactjs.org/docs/refs-and-the-dom.html) to the `svg` element (don't use strings).
 
 ### addIcons
 
@@ -110,12 +110,14 @@ Example:
 
 ```js
 import { addIcons } from 'react-svg-ionicons'
-import addCircleOutline from 'react-svg-ionicons/icon/add-circle-outline'
-import removeCircleOutline from 'react-svg-ionicons/icon/remove-circle-outline'
+import alarm from 'react-svg-ionicons/icons/alarm'
+import trash from 'react-svg-ionicons/icons/trash'
+import arrowBack from 'react-svg-ionicons/icons/arrow-back'
 
 addIcons({
-  'add-circle-outline': addCircleOutline,
-  'remove-circle-outline': removeCircleOutline,
+  'alarm': alarm,
+  'trash': trash,
+  'back': arrowBack,
 })
 ```
 
