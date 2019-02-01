@@ -1,6 +1,6 @@
 # react-svg-ionicons Changes
 
-## \[Unreleased]
+## \[0.2.1] - 2019-02-01
 
 ### Changed
 

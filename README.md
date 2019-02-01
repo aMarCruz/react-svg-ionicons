@@ -9,7 +9,7 @@ From the [Ionicon site](https://ionicons.com/)
 
 > Ionicons is a completely open-source icon set with 700+ icons crafted for web, iOS, Android, and desktop apps. Ionicons was built for Ionic Framework, so icons have both Material Design and iOS versions.
 
-react-svg-ionicons exports an `IonIcon` component, similar to the Ionic's `ion-icon` Web Component, to render SVG icons in web pages with automatic detection of the icon type (iOS or Material Design) based on your platform.
+react-svg-ionicons exports an `IonIcon` component, similar to the Ionic's `ion-icon` Web Component, to render SVG icons in web pages with automatic detection of the icon style (iOS or Material Design) based on your platform.
 
 _**WARNING:** Folders "bundle" and "icon" now are "bundles" and "icons" and the `iconType` property is `mode`, for consistency with the ion-icon Web Component._
 
@@ -82,7 +82,7 @@ IonIcon accepts almost any valid SVG attribute in (react) _camel-case_ notation,
 
 - **mode**
 
-  The mode determines which platform styles to use, either `"ios"` or `"md"`.
+  The `mode` property determines which platform styles to use, either `"ios"` or `"md"`.
 
   By using this property you will override the automatic detection of the platform.
 
