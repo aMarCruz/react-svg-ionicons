@@ -16,7 +16,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var React = require("react");
 var PropTypes = require("prop-types");
 var invariant = require("invariant");
-var deepClone = require("@jsbits/deep-clone");
 var UNDEF = undefined;
 /**
  * We are running in a Mac-like OS?
@@ -34,9 +33,12 @@ var isObject = function (obj) { return !!obj && typeof obj === 'object'; };
  * Simple `Object.assign`-like function
  */
 var assign = function (dest, src) {
+    dest = dest || {};
     if (src) {
         Object.keys(src).forEach(function (k) {
-            dest[k] = src[k];
+            dest[k] = isObject(src[k])
+                ? assign(isObject(dest[k]) ? dest[k] : {}, src[k])
+                : src[k];
         });
     }
     return dest;
@@ -101,7 +103,7 @@ exports.addIcons = function (iconMap) {
  */
 exports.setDefaults = function (defaults) {
     invariant(isObject(defaults), 'The defaults must be an object.');
-    var defs = assign(_Conf.defs, deepClone(defaults));
+    var defs = assign(_Conf.defs, defaults);
     // check and format class names, if any
     if (defs.className) {
         defs.className = classAsStr(defs.className).trim() || UNDEF;
@@ -135,10 +137,10 @@ var IonIcon = /** @class */ (function (_super) {
     }
     IonIcon.prototype.expandAttr = function (opts, name, value) {
         var _a = expandFrom[name], p1 = _a[0], p2 = _a[1];
-        if (opts[p1] !== UNDEF) {
+        if (opts[p1] === UNDEF) {
             opts[p1] = value;
         }
-        if (opts[p2] !== UNDEF) {
+        if (opts[p2] === UNDEF) {
             opts[p2] = value;
         }
     };
@@ -152,6 +154,7 @@ var IonIcon = /** @class */ (function (_super) {
         // Example of precedence [fill, stroke] = troke:
         // fill = user.fill -> defs.fill -> user.color -> defs.color
         // even if any of them is `null`, it will overrite.
+        debugger;
         if (props.color !== UNDEF) {
             this.expandAttr(props, 'color', props.color);
         }
@@ -184,7 +187,7 @@ var IonIcon = /** @class */ (function (_super) {
         return props;
     };
     IonIcon.prototype.render = function () {
-        var opts = deepClone(this.props);
+        var opts = assign({}, this.props);
         var name = opts.name;
         delete opts.name;
         var renderIcon = _Conf.map[name];

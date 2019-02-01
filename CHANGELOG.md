@@ -5,7 +5,7 @@
 ### Added
 
 - Add ESLint and fix minor linting issues.
-- @jsbits/get-package-version
+- ~~@jsbits/get-package-version~~
 
 ### Changed
 
