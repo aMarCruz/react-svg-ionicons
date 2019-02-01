@@ -10,6 +10,7 @@
 ### Fixed
 
 - The propType `iconType` must be `mode`.
+- Fix `Nullable` typing error
 
 ## \[0.2.0] - 2019-02-01
 

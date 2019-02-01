@@ -13,7 +13,7 @@ react-svg-ionicons exports an `IonIcon` component, similar to the Ionic's `ion-i
 
 _**WARNING:** Folders "bundle" and "icon" now are "bundles" and "icons" and the `iconType` property is `mode`, for consistency with the ion-icon Web Component._
 
-_This is **WIP** and break changes are expected. I hope to stabilize the API in v0.3.0._
+_This is **WIP** and breaking changes are expected. I hope to stabilize the API in v0.3.0._
 
 Thanks to the [Ionic Framework](https://ionicframework.com/) team for their awesome work!
 
@@ -33,9 +33,9 @@ Before using the main `IonIcon` component, you must add subcomponents (`SVGIcon`
 
 I include three convenience bundles in the folder "bundles":
 
-- all : The full set.
-- generic : All the dual icons.
-- logos : Only the "logo" icons.
+- `all` : The full icon set.
+- `generic` : All the dual icons.
+- `logos` : Only the "logo" icons.
 
 ```ts
 import { IonIcon, addIcons } from 'react-svg-ionicons'

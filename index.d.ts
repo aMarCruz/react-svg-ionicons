@@ -1,16 +1,16 @@
 /**
- * react-svg-ionicons v0.2.0 with svg files from Ionicons v4.5.5
+ * react-svg-ionicons v0.2.1 with svg files from Ionicons v4.5.5
  *
  * 317 dual-mode icons, 62 logo icons.
  *
  * @auhtor aMarCruz <amarcruzbox-git@yahoo.com>
- * @date 2019-02-01 @ 08:06
+ * @date 2019-02-01 @ 19:13
  * @license MIT
  */
 import * as React from 'react'
 
 // tslint:disable-next-line:ban-types
-export type Nullable<T> = { [K in keyof T]: (K extends Object ? Nullable<T[K]> : T[K]) | null }
+export type Nullable<T> = { [K in keyof T]: (Object extends T[K] ? Nullable<T[K]> : T[K]) | null }
 export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
 
 /**
@@ -27,7 +27,7 @@ export interface IonIconProps extends React.ClassAttributes<IonIcon>,
   color?: string
   size?: string | number
   mode?: 'ios' | 'md'
-  innerRef?: React.ClassAttributes<SVGSVGElement>['ref']
+  innerRef?: React.Ref<SVGSVGElement>
 }
 
 /**
