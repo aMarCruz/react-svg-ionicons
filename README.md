@@ -11,7 +11,9 @@ From the [Ionicon site](https://ionicons.com/)
 
 react-svg-ionicons exports an `IonIcon` component, similar to the Ionic's `ion-icon` Web Component, to render SVG icons in web pages with automatic detection of the icon type (iOS or Material Design) based on your platform.
 
-_**NOTE:** This is **WIP** and break changes are expected. I hope to stabilize the API in v0.3.0._
+_**WARNING:** Folders "bundle" and "icon" now are "bundles" and "icons" and the `iconType` property is `mode`, for consistency with the ion-icon Web Component._
+
+_This is **WIP** and break changes are expected. I hope to stabilize the API in v0.3.0._
 
 Thanks to the [Ionic Framework](https://ionicframework.com/) team for their awesome work!
 
