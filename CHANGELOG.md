@@ -2,6 +2,12 @@
 
 ## \[Unreleased]
 
+### Fixed
+
+- The propType `iconType` must be `mode`.
+
+## \[0.2.0] - 2019-02-01
+
 ### Added
 
 - Add ESLint and fix minor linting issues.

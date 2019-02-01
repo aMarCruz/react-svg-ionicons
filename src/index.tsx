@@ -145,7 +145,7 @@ export class IonIcon extends React.PureComponent<IonIconProps> {
     name: PropTypes.string.isRequired,
     color: PropTypes.string,
     size: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    iconType: PropTypes.oneOf(['ios', 'md']),
+    mode: PropTypes.oneOf(['ios', 'md']),
     innerRef: PropTypes.func,
   }
 
