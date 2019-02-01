@@ -17,15 +17,20 @@ var React = require("react");
 var PropTypes = require("prop-types");
 var invariant = require("invariant");
 var deepClone = require("@jsbits/deep-clone");
-/*
-  https://developer.mozilla.org/en-US/docs/Web/API/NavigatorID/platform
-*/
-var isMacLike = /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform);
-var isObject = function (obj) {
-    return !!obj && typeof obj === 'object';
-};
 /**
- * Simple Object.assign-like function
+ * We are running in a Mac-like OS?
+ */
+var isMacLike = /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform);
+/**
+ * Shorthand to `Object.keys` that returns a more-sense type.
+ */
+var keyArray = Object.keys;
+/**
+ * Check if `obj` is a non-falsy object.
+ */
+var isObject = function (obj) { return !!obj && typeof obj === 'object'; };
+/**
+ * Simple `Object.assign`-like function
  */
 var assign = function (dest, src) {
     if (src) {
@@ -36,7 +41,21 @@ var assign = function (dest, src) {
     return dest;
 };
 /**
- * Ensure className as string
+ * Deep remotion of `null` and `undefined` values of an object.
+ */
+var pack = function (obj) {
+    keyArray(obj).forEach(function (k) {
+        if (obj[k] == null) {
+            delete obj[k];
+        }
+        else if (typeof obj[k] === 'object') {
+            obj[k] = pack(obj[k]);
+        }
+    });
+    return obj;
+};
+/**
+ * Ensure to get a non-empty `className` as an string.
  */
 var classAsStr = function (klass) {
     if (typeof klass === 'string') {
@@ -45,56 +64,61 @@ var classAsStr = function (klass) {
     invariant(Array.isArray(klass), 'className must be a string or array.');
     return klass.filter(Boolean).join(' ');
 };
-/*
-  Internal configuration
-*/
+/**
+ * Internal configuration object.
+ */
 var _Conf = {
     map: {},
-    def: {
+    defs: {
         display: 'inline-block',
         fill: 'currentColor',
         stroke: 'currentColor',
-        size: 'regular',
+        size: '1em',
     },
-    sz: {
-        small: '0.75em',
-        regular: '1em',
-        large: '1.25em',
-        larger: '2em',
-        largest: '3em',
+    sizes: {
+        small: '18px',
+        large: '32px',
     },
 };
 /**
- * Adds the given icons, without remove the existents.
+ * Merge the given icons with the existent ones.
+ *
+ * To remove existing icons, set its value to `null` of `undefined`.
+ *
+ * @param {Object.<string,?Function>} iconMap Object with name-icon translations.
  */
 exports.addIcons = function (iconMap) {
     invariant(isObject(iconMap), 'The iconMap must be an object.');
-    assign(_Conf.map, iconMap);
+    pack(assign(_Conf.map, iconMap));
 };
 /**
  * Merge the given values with the current defaults.
- * Pass `null` to remove the defaults.
+ *
+ * Values with `null` or `undefined` will remove the existing property.
+ *
+ * @param {Object.<string,*>} defaults Properties to merge.
  */
 exports.setDefaults = function (defaults) {
-    if (defaults === null) {
-        _Conf.def = {};
+    invariant(isObject(defaults), 'The defaults must be an object.');
+    var defs = assign(_Conf.defs, deepClone(defaults));
+    // check and format class names, if any
+    if (defs.className) {
+        defs.className = classAsStr(defs.className).trim() || undefined;
     }
-    else {
-        invariant(isObject(defaults), 'The defaults must be an object.');
-        var defs = assign(_Conf.def, deepClone(defaults));
-        if (defs.className) {
-            defs.className = classAsStr(defs.className);
-        }
-        delete defs.innerRef;
-        delete defs.name;
-    }
+    // cleanup empty properties
+    pack(defs);
 };
 /**
  * Reset the table of named sizes.
+ *
+ * You can use custom names here, to remove the prdefined names, 'small'
+ * and 'large', set them to `null` or `undefined`.
+ *
+ * @param {Object.<string,?string|number>} sizes Object with a sizes map.
  */
 exports.setSizes = function (sizes) {
     invariant(isObject(sizes), 'The sizes must be an object.');
-    assign(_Conf.sz, sizes);
+    pack(assign(_Conf.sizes, sizes));
 };
 /**
  * Renders a SVG Ionicon
@@ -105,46 +129,46 @@ var IonIcon = /** @class */ (function (_super) {
         return _super !== null && _super.apply(this, arguments) || this;
     }
     /**
-     * Determina si se debe usar el icono "ios".
-     *
-     * Si el icono es "logo" devuelve `true`, pero en este caso no importa
-     * el valor devuelto, los iconos "logo" lo ignoran.
+     * Merge the user properties with the defaults, taking care to preserve
+     * the classes and styles of both.
      */
-    IonIcon.prototype.ios = function (name, type) {
-        return name.lastIndexOf('logo-', 0) === 0 || type === 'ios' || isMacLike;
-    };
-    IonIcon.prototype.mergeProps = function (props) {
-        var dest = deepClone(_Conf.def);
-        var classes = dest.className || '';
-        if (props.className) {
-            classes += " " + classAsStr(props.className);
+    IonIcon.prototype.mergeDefs = function (props) {
+        var defs = _Conf.defs;
+        var keys = keyArray(defs);
+        for (var i = 0; i < keys.length; i++) {
+            var k = keys[i];
+            switch (k) {
+                case 'className':
+                    props.className = props.className
+                        ? classAsStr(props.className) + " " + defs.className
+                        : defs.className;
+                    break;
+                case 'style':
+                    props.style = props.style
+                        ? assign(assign({}, props.style), defs.style)
+                        : defs.style;
+                    break;
+                default:
+                    if (!props.hasOwnProperty(k)) {
+                        props[k] = defs[k];
+                    }
+            }
         }
-        var style = dest.style;
-        if (props.style) {
-            style = assign(style || {}, props.style);
-        }
-        assign(dest, props);
-        if (classes) {
-            dest.className = classes.trim();
-        }
-        if (style) {
-            dest.style = style;
-        }
-        return dest;
+        return props;
     };
     IonIcon.prototype.render = function () {
-        var opts = this.mergeProps(this.props);
+        var opts = deepClone(this.props);
         var name = opts.name;
         delete opts.name;
         var renderIcon = _Conf.map[name];
         invariant(renderIcon, "The icon \"" + name + "\" is not registered.");
-        var ios = this.ios(name, opts.iconType);
-        delete opts.iconType;
         var innerRef = opts.innerRef;
         if (innerRef !== null) {
             delete opts.innerRef;
             opts.ref = innerRef;
         }
+        // name & innerRef are out, merge with defaults before color & size
+        this.mergeDefs(opts);
         var color = opts.color;
         if (color != null) {
             delete opts.color;
@@ -153,7 +177,13 @@ var IonIcon = /** @class */ (function (_super) {
         var size = opts.size;
         if (size != null) {
             delete opts.size;
-            opts.width = opts.height = typeof size === 'string' && _Conf.sz[size] || size;
+            opts.width = opts.height = typeof size === 'string' && _Conf.sizes[size] || size;
+        }
+        // Guess whether the "iOS" style should be used with double-style icons.
+        var ios = isMacLike;
+        if (opts.mode) {
+            ios = opts.mode === 'ios';
+            delete opts.mode;
         }
         return renderIcon(opts, ios);
     };

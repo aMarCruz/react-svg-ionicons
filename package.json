@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "@jsbits/deep-clone": "^1.1.1",
+    "@jsbits/get-package-version": "^1.0.3",
     "invariant": "^2.0.0",
     "prop-types": "^15.0.0"
   },

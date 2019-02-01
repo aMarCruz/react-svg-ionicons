@@ -23,6 +23,11 @@
   resolved "https://registry.yarnpkg.com/@jsbits/deep-clone/-/deep-clone-1.1.1.tgz#860170821fc23d0db9b405fdfaa0811969962cae"
   integrity sha512-aKhOhRv18tlhkjapBrcyAt8U1SmyzKi2QoO4GGMlXRfQhwm7USDSo/pX8MgB8tYB3MLaevuvwufynKSDA7U3EA==
 
+"@jsbits/get-package-version@^1.0.3":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@jsbits/get-package-version/-/get-package-version-1.0.3.tgz#a47dfd077420beee435580c3bc197931fe3c694c"
+  integrity sha512-IJy1jRL01x7p6UEpgKa1lVLstMUx8EiIR8pPoS5sBfsHEoeLkzYiNpAfxPx8zLDUJyS1yBbChJjcWdPqyH285w==
+
 "@types/invariant@^2.2.29":
   version "2.2.29"
   resolved "https://registry.yarnpkg.com/@types/invariant/-/invariant-2.2.29.tgz#aa845204cd0a289f65d47e0de63a6a815e30cc66"

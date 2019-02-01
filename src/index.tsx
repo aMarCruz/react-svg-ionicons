@@ -2,7 +2,7 @@ import React = require('react')
 import PropTypes = require('prop-types')
 import invariant = require('invariant')
 import deepClone = require('@jsbits/deep-clone')
-import { IconMap, IonIconDefs, IonIconSizes, IonIconProps } from '..'
+import { IconMap, IonIconDefs, IonIconProps, IonIconSizes, Nullable } from '..'
 
 type Dict<T = any> = { [k: string]: T }
 type Merge<T> = { [K in keyof T]: T[K] }
@@ -10,7 +10,7 @@ type Merge<T> = { [K in keyof T]: T[K] }
 type IonConf = {
   map: IconMap,
   defs: IonIconDefs,
-  sizes: Dict<string>,
+  sizes: IonIconSizes,
 }
 
 /**
@@ -41,12 +41,14 @@ const assign = function<T extends Dict, U extends Dict> (dest: T, src: U) {
 }
 
 /**
- * Remove the `null` or `undefined` properties of an object.
+ * Deep remotion of `null` and `undefined` values of an object.
  */
 const pack = <T extends Dict> (obj: T) => {
   keyArray(obj).forEach((k) => {
     if (obj[k] == null) {
       delete obj[k]
+    } else if (typeof obj[k] === 'object') {
+      obj[k] = pack(obj[k])
     }
   })
   return obj
@@ -72,53 +74,55 @@ const _Conf: IonConf = {
     display: 'inline-block',
     fill: 'currentColor',
     stroke: 'currentColor',
-    size: 'regular',
+    size: '1em',
   },
   sizes: {
-    small: '0.75em',
-    regular: '1em',
-    large: '1.25em',
-    larger: '2em',
-    largest: '3em',
+    small: '18px',
+    large: '32px',
   },
 }
 
 /**
- * Adds the given icons, without remove the existent ones.
+ * Merge the given icons with the existent ones.
+ *
+ * To remove existing icons, set its value to `null` of `undefined`.
+ *
+ * @param {Object.<string,?Function>} iconMap Object with name-icon translations.
  */
-export const addIcons = function (iconMap: IconMap) {
+export const addIcons = function (iconMap: Nullable<IconMap>) {
   invariant(isObject(iconMap), 'The iconMap must be an object.')
   pack(assign(_Conf.map, iconMap))
 }
 
 /**
  * Merge the given values with the current defaults.
- * Pass `null` to remove the defaults.
+ *
+ * Values with `null` or `undefined` will remove the existing property.
+ *
+ * @param {Object.<string,*>} defaults Properties to merge.
  */
-export const setDefaults = function (defaults: IonIconDefs) {
-  if (defaults === null) {
-    _Conf.defs = {}
-  } else {
-    invariant(isObject(defaults), 'The defaults must be an object.')
-    const defs = assign(_Conf.defs, deepClone(defaults))
+export const setDefaults = function (defaults: Nullable<IonIconDefs>) {
+  invariant(isObject(defaults), 'The defaults must be an object.')
+  const defs = assign(_Conf.defs, deepClone(defaults))
 
-    // check and format class names, if any
-    if (defs.className) {
-      defs.className = classAsStr(defs.className).trim()
-    }
-
-    // cleanup empty properties
-    if (!defs.className) {
-      delete defs.className
-    }
-    pack(defs)
+  // check and format class names, if any
+  if (defs.className) {
+    defs.className = classAsStr(defs.className).trim() || undefined
   }
+
+  // cleanup empty properties
+  pack(defs)
 }
 
 /**
- * Reset the table of named sizes. You can extend this.
+ * Reset the table of named sizes.
+ *
+ * You can use custom names here, to remove the prdefined names, 'small'
+ * and 'large', set them to `null` or `undefined`.
+ *
+ * @param {Object.<string,?string|number>} sizes Object with a sizes map.
  */
-export const setSizes = function (sizes: string[]) {
+export const setSizes = function (sizes: Nullable<IonIconSizes>) {
   invariant(isObject(sizes), 'The sizes must be an object.')
   pack(assign(_Conf.sizes, sizes))
 }
@@ -201,9 +205,9 @@ export class IonIcon extends React.PureComponent<IonIconProps> {
 
     // Guess whether the "iOS" style should be used with double-style icons.
     let ios = isMacLike
-    if (opts.iconType) {
-      ios = opts.iconType === 'ios'
-      delete opts.iconType
+    if (opts.mode) {
+      ios = opts.mode === 'ios'
+      delete opts.mode
     }
 
     return renderIcon(opts, ios)

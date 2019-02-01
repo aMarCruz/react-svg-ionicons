@@ -1,4 +1,5 @@
 const fs = require('fs')
+const getPackageVersion = require('@jsbits/get-package-version')
 const { camelize, ensurePath, formatDate, ROOT_DIR } = require('./utils')
 
 // Editar este PREFIX si ionic cambia el formato
@@ -91,11 +92,19 @@ export default (props: object${parm}) =>${makeIcon(name, item)}</svg>
 /**
  * Creates the typings.
  * @param {string[]} names
+ * @param {[number, number]} count
  */
-const makeTypings = (names) => {
-  const text = fs.readFileSync(`${__dirname}/index.d.ts.tmpl`, 'utf8')
-    .replace('@{date}', formatDate())
-    .replace('@{names}', names.map((e) => `  | '${e}'`).join('\n'))
+const makeTypings = (names, count) => {
+  const data = {
+    'names': names.map((e) => `  | '${e}'`).join('\n'),
+    'package-version': getPackageVersion(),
+    'ionicon-version': getPackageVersion(IONICONS),
+    'dual-icons': count[0],
+    'logo-icons': count[1],
+    'date': formatDate(),
+  }
+  const text = fs.readFileSync(`${__dirname}/index.d.ts.template`, 'utf8')
+    .replace(/@\{([-a-z]+)\}/g, (match, name) => data[name] || match)
 
   fs.writeFileSync(`${ROOT_DIR}/index.d.ts`, text, 'utf8')
 }
@@ -148,48 +157,10 @@ const parseSvg = (file) => {
 }
 
 /**
- * Read the whole ionicons "svg" folder
- * @param {string} inDir
- */
-const readTags = (inDir) => {
-  /** @type {SvgPathInfo} */
-  const info = {}
-  const list = fs.readdirSync(inDir, 'utf8')
-  let count = 0
-  inDir += '/'
-
-  list.filter((file) => file.endsWith('.svg')).forEach((file) => {
-    let name = file.slice(0, -4) // remove extension
-
-    // First two are the 'ios' and 'md' prefixes
-    const idx = ICON_PREFIXES.indexOf(name.split('-').shift())
-    if (idx < 0) {
-      console.log(`Ignored: ${file}`)
-      return
-    }
-
-    file = inDir + file
-    count++
-
-    if (idx >= 2) {
-      info[name] = parseSvg(file)
-
-    } else {
-      name = name.substr(name.indexOf('-') + 1)
-      // @ts-ignore
-      const elem = info[name] || (info[name] = [])
-      elem[idx] = parseSvg(file)
-    }
-  })
-
-  console.log(`${count} svg files readed.`)
-  return info
-}
-
-/**
  * @param {SvgPathInfo} info
+ * @param {[number, number]} count
  */
-const writeFiles = (info) => {
+const writeFiles = (info, count) => {
   const names = Object.keys(info)
 
   names.sort().forEach((name) => {
@@ -204,11 +175,52 @@ const writeFiles = (info) => {
     createTSX(name, item)
   })
 
-  makeTypings(names)
+  makeTypings(names, count)
   makeBundle('all', names, () => true)
   makeBundle('logos', names, (e) => e.startsWith('logo-'))
   makeBundle('generic', names, (e) => !e.startsWith('logo-'))
 }
 
-const tags = readTags(IONICONS)
-writeFiles(tags)
+/**
+ * Read the whole ionicons "svg" folder
+ * @param {string} inDir
+ */
+const buildAll = (inDir) => {
+  /** @type {SvgPathInfo} */
+  const info  = {}
+  const list  = fs.readdirSync(inDir, 'utf8')
+  const count = [0, 0]
+  inDir += '/'
+
+  list.filter((file) => file.endsWith('.svg')).forEach((file) => {
+    let name = file.slice(0, -4) // remove extension
+
+    // First two are the 'ios' and 'md' prefixes
+    const idx = ICON_PREFIXES.indexOf(name.split('-').shift())
+    if (idx < 0) {
+      console.log(`Ignored: ${file}`)
+      return
+    }
+
+    file = inDir + file
+
+    if (idx >= 2) {
+      info[name] = parseSvg(file)
+      count[1]++
+
+    } else {
+      name = name.substr(name.indexOf('-') + 1)
+      // @ts-ignore
+      const elem = info[name] || (info[name] = [])
+
+      elem[idx] = parseSvg(file)
+      count[0] += idx // 0 or 1
+    }
+  })
+
+  console.log(`Readed ${count[0]} dual-mode icons, ${count[1]} logo icons.`)
+
+  return writeFiles(info, count)
+}
+
+buildAll(IONICONS)
