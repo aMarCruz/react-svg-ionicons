@@ -4,7 +4,7 @@
  * 317 dual-mode icons, 62 logo icons.
  *
  * @auhtor aMarCruz <amarcruzbox-git@yahoo.com>
- * @date 2019-02-01 @ 04:43
+ * @date 2019-02-01 @ 08:06
  * @license MIT
  */
 import * as React from 'react'
@@ -36,6 +36,11 @@ export interface IonIconProps extends React.ClassAttributes<IonIcon>,
 export type IconMap = { [K in IconNames]?: SVGIcon }
 
 /**
+ * Allows to accept custom names in addIcons.
+ */
+export type CustomIconMap = { [k: string]: SVGIcon | null | undefined }
+
+/**
  * Possible defaults
  */
 export interface IonIconDefs extends Omit<IonIconProps, 'name' | 'innerRef'> {
@@ -59,7 +64,7 @@ export declare class IonIcon extends React.PureComponent<IonIconProps> {
  *
  * @param iconMap Object with name-icon translations.
  */
-export function addIcons(iconMap: Nullable<IconMap>): void
+export function addIcons(iconMap: Nullable<IconMap> & CustomIconMap): void
 
 /**
  * Merge the given values with the current defaults.

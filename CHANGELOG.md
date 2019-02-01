@@ -5,6 +5,7 @@
 ### Changed
 
 - Update Readme.
+- Allows to accept custom names in addIcons (TS typings).
 
 ### Fixed
 
