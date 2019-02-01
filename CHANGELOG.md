@@ -6,6 +6,8 @@
 
 - Update Readme.
 - Allows to accept custom names in addIcons (TS typings).
+- Ko-fi link.
+- [MarkdownLint](https://www.npmjs.com/package/markdownlint) rules.
 
 ### Fixed
 

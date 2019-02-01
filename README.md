@@ -175,6 +175,16 @@ You can use this values through the `size` property of IonIcon:
 
 The value will be applied to the `width` and `height` attributes of the `<svg>` element.
 
+## Support my Work
+
+I'm a full-stack developer with more than 20 year of experience and I try to share most of my work for free and help others, but this takes a significant amount of time and effort so, if you like my work, please consider...
+
+[<img src="https://amarcruz.github.io/images/kofi_blue.png" height="36" title="Support Me on Ko-fi" />][kofi-url]
+
+Of course, feedback, PRs, and stars are also welcome 🙃
+
+Thanks for your support!
+
 ## License
 
 The [MIT](LICENSE) Licence
@@ -185,3 +195,4 @@ The [MIT](LICENSE) Licence
 [license-url]:    https://github.com/aMarCruz/react-svg-ionicons/blob/master/LICENSE
 [npm-badge]:      https://img.shields.io/npm/v/react-svg-ionicons.svg
 [npm-url]:        https://www.npmjs.com/package/react-svg-ionicons
+[kofi-url]:       https://ko-fi.com/C0C7LF7I
