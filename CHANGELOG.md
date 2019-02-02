@@ -1,5 +1,11 @@
 # react-svg-ionicons Changes
 
+## \[Unreleased]
+
+### Changed
+
+- Allow defaults to override specific `undefined` properties.
+
 ## \[0.2.2] - 2019-02-02
 
 ### Added

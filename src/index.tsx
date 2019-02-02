@@ -242,7 +242,7 @@ export class IonIcon extends React.PureComponent<IconProps> {
           break
 
         default:
-          if (!props.hasOwnProperty(k)) {
+          if (props[k] === UNDEF) {
             props[k] = defs[k]
           }
       }
