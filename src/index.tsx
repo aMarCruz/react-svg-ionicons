@@ -1,6 +1,7 @@
 import React = require('react')
 import PropTypes = require('prop-types')
 import invariant = require('invariant')
+import iconTitles = require('./bundles/icon-titles')
 import { IconMap, IonIconDefs, IonIconProps, IonIconSizes, IconNames } from '..'
 
 type Dict<T = any> = { [k: string]: T }
@@ -10,6 +11,7 @@ type IonConf = {
   map: IconMap,
   defs: IonIconDefs,
   sizes: IonIconSizes,
+  titles: Dict<string>,
 }
 
 const UNDEF = undefined
@@ -84,6 +86,7 @@ const _Conf: IonConf = {
     small: '18px',
     large: '32px',
   },
+  titles: iconTitles,
 }
 
 /**
@@ -132,11 +135,36 @@ export const setSizes = function (sizes: IonIconSizes) {
 }
 
 /**
+ * Add icon titles to the icon-name -> title transtations.
+ *
+ * @param {Object.<string,?string>} sizes Object with a sizes map.
+ */
+export const setTitles = function (iconTitles: Dict<string | null>) {
+  invariant(isObject(iconTitles), 'The icon titles must be an object.')
+  pack(assign(_Conf.titles, iconTitles))
+}
+
+/**
  * Renders a SVG Ionicon
  */
 export class IonIcon extends React.PureComponent<IconProps> {
 
-  static propTypes: object
+  static propTypes = {
+    name: PropTypes.string.isRequired,
+    color: PropTypes.string,
+    size: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    mode: PropTypes.oneOf(['ios', 'md']),
+    title: PropTypes.string,
+    innerRef: PropTypes.func,
+    children: PropTypes.oneOf([undefined])
+  }
+
+  titleify(name: string) {
+    const title = name[0].toUpperCase() +
+      name.substr(1).replace(/-+([a-z])/g, (_, c) => ` ${c.toUpperCase()}`)
+
+    return (_Conf.titles[name] = title)
+  }
 
   expandColor(opts: Dict, color?: string) {
     if (opts.fill === UNDEF) {
@@ -219,6 +247,11 @@ export class IonIcon extends React.PureComponent<IconProps> {
     const renderIcon = _Conf.map[name]!
     invariant(renderIcon, 'The icon "%s" is not registered.', name)
 
+    const iconTitle = opts.title != UNDEF
+      ? opts.title
+      : (_Conf.titles[name] || this.titleify(name))
+    delete opts.title
+
     const innerRef = opts.innerRef
     if (innerRef !== null) {
       delete opts.innerRef
@@ -235,15 +268,6 @@ export class IonIcon extends React.PureComponent<IconProps> {
       delete opts.mode
     }
 
-    return renderIcon(opts, ios)
+    return renderIcon(opts, iconTitle, ios)
   }
-}
-
-IonIcon.propTypes = {
-  name: PropTypes.string.isRequired,
-  color: PropTypes.string,
-  size: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  mode: PropTypes.oneOf(['ios', 'md']),
-  innerRef: PropTypes.func,
-  children: PropTypes.oneOf([undefined])
 }

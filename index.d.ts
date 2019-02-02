@@ -4,7 +4,7 @@
  * 317 dual-mode icons, 62 logo icons.
  *
  * @auhtor aMarCruz <amarcruzbox-git@yahoo.com>
- * @date 2019-02-02T08:09:51Z
+ * @date 2019-02-02T11:28:05Z
  * @license MIT
  */
 import * as React from 'react'
@@ -16,17 +16,36 @@ export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
 /**
  * SVG icon renderizer.
  */
-export interface SVGIcon { (opts: object, ios?: boolean): JSX.Element }
+export interface SVGIcon { (opts: object, iconTitle: string, ios?: boolean): JSX.Element }
 
 /**
  * IonIcon class properties and attributes.
  */
 export interface IonIconProps<T extends string> extends
     Omit<React.SVGAttributes<SVGSVGElement>, 'xmlns' | 'viewBox' | 'children'> {
+  /**
+   * The name with which the icon was registered.
+   */
   name: T
+  /**
+   * Color for `fill` and `stroke`, in any format accepted by CSS.
+   */
   color?: string
+  /**
+   * Value for `width` and `height`, any format accepted by CSS.
+   */
   size?: string | number
+  /**
+   * Icon style, overrides automatic detection of the platform.
+   */
   mode?: 'ios' | 'md'
+  /**
+   * Overrides the default title (icon name in Title Case).
+   */
+  title?: string
+  /**
+   * React `ref` to the `<svg>` element.
+   */
   innerRef?: React.Ref<SVGSVGElement>
 }
 
@@ -43,7 +62,7 @@ export type CustomIconMap = { [k: string]: SVGIcon | null | undefined }
 /**
  * Possible defaults
  */
-export interface IonIconDefs extends Omit<IonIconProps<''>, 'name' | 'innerRef'> {
+export interface IonIconDefs extends Omit<IonIconProps<''>, 'name' | 'title' | 'innerRef'> {
 }
 
 /**

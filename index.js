@@ -16,6 +16,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var React = require("react");
 var PropTypes = require("prop-types");
 var invariant = require("invariant");
+var iconTitles = require("./bundles/icon-titles");
 var UNDEF = undefined;
 /**
  * We are running in a Mac-like OS?
@@ -82,6 +83,7 @@ var _Conf = {
         small: '18px',
         large: '32px',
     },
+    titles: iconTitles,
 };
 /**
  * Merge the given icons with the existent ones.
@@ -124,6 +126,15 @@ exports.setSizes = function (sizes) {
     pack(assign(_Conf.sizes, sizes));
 };
 /**
+ * Add icon titles to the icon-name -> title transtations.
+ *
+ * @param {Object.<string,?string>} sizes Object with a sizes map.
+ */
+exports.setTitles = function (iconTitles) {
+    invariant(isObject(iconTitles), 'The icon titles must be an object.');
+    pack(assign(_Conf.titles, iconTitles));
+};
+/**
  * Renders a SVG Ionicon
  */
 var IonIcon = /** @class */ (function (_super) {
@@ -131,6 +142,11 @@ var IonIcon = /** @class */ (function (_super) {
     function IonIcon() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
+    IonIcon.prototype.titleify = function (name) {
+        var title = name[0].toUpperCase() +
+            name.substr(1).replace(/-+([a-z])/g, function (_, c) { return " " + c.toUpperCase(); });
+        return (_Conf.titles[name] = title);
+    };
     IonIcon.prototype.expandColor = function (opts, color) {
         if (opts.fill === UNDEF) {
             opts.fill = color;
@@ -199,6 +215,10 @@ var IonIcon = /** @class */ (function (_super) {
         delete opts.name;
         var renderIcon = _Conf.map[name];
         invariant(renderIcon, 'The icon "%s" is not registered.', name);
+        var iconTitle = opts.title != UNDEF
+            ? opts.title
+            : (_Conf.titles[name] || this.titleify(name));
+        delete opts.title;
         var innerRef = opts.innerRef;
         if (innerRef !== null) {
             delete opts.innerRef;
@@ -212,16 +232,17 @@ var IonIcon = /** @class */ (function (_super) {
             ios = opts.mode === 'ios';
             delete opts.mode;
         }
-        return renderIcon(opts, ios);
+        return renderIcon(opts, iconTitle, ios);
+    };
+    IonIcon.propTypes = {
+        name: PropTypes.string.isRequired,
+        color: PropTypes.string,
+        size: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+        mode: PropTypes.oneOf(['ios', 'md']),
+        title: PropTypes.string,
+        innerRef: PropTypes.func,
+        children: PropTypes.oneOf([undefined])
     };
     return IonIcon;
 }(React.PureComponent));
 exports.IonIcon = IonIcon;
-IonIcon.propTypes = {
-    name: PropTypes.string.isRequired,
-    color: PropTypes.string,
-    size: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    mode: PropTypes.oneOf(['ios', 'md']),
-    innerRef: PropTypes.func,
-    children: PropTypes.oneOf([undefined])
-};

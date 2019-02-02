@@ -1,3 +1,4 @@
+const { distWrite } = require('./utils')
 const { kebabToTitle } = require('./utils')
 
 const fixes = {
@@ -26,4 +27,15 @@ const fixes = {
 /**
  * @param {string} name
  */
-module.exports = (name) => `<title>${fixes[name] || kebabToTitle(name)}</title>`
+const toTitle = (name) => `  '${name}': '${fixes[name] || kebabToTitle(name)}',\n`
+
+/**
+ * Creates the /index.d.ts file with the package typings.
+ *
+ * @param {string[]} names
+ * @param {[number, number]} count
+ */
+module.exports = function makeTitles (names) {
+  const text = `module.exports = {\n${names.map(toTitle).join('')}}\n`
+  distWrite('icon-titles.js', text)
+}

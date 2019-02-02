@@ -1,10 +1,10 @@
+const makeTitles = require('./make-titles')
 const makeTypings = require('./make-typings')
 const readSvgFiles = require('./read-svg-files')
-const iconTagTitle = require('./icon-tag-title')
 const { camelize, ensurePath, distWrite, iconWrite, formatDate } = require('./utils')
 const { IDX_IOS, IDX_MD, PREFIX, ICON_FOLDER, DIST_FOLDER } = require('./constants')
 
-const REP_TAG = PREFIX.slice(0, -1) + ' {...props}>'
+const REP_TAG = PREFIX.slice(0, -1) + ' {...props}>\n<title>{iconTitle}</title>'
 
 ensurePath(DIST_FOLDER)
 ensurePath(ICON_FOLDER)
@@ -20,12 +20,10 @@ ensurePath(ICON_FOLDER)
  * @param {string | string[]} item
  */
 const makeIcon = (name, item) => {
-  const title = iconTagTitle(name)
-
   const gTag = `<g className="ion-${name}">`
 
   if (typeof item === 'string') {
-    return `\n${REP_TAG}\n${title}${gTag}\n${item}\n</g>`
+    return `\n${REP_TAG}\n${gTag}\n${item}\n</g>`
   }
 
   const ios = item[IDX_IOS].replace(/>\s+</g, '')
@@ -34,7 +32,6 @@ const makeIcon = (name, item) => {
   if (~ios.indexOf('><') || ~md.indexOf('><')) {
     return `
   ${REP_TAG}
-  ${title}
   {ios
   ? ${gTag}${ios}</g>
   : ${gTag}${md}</g>}`
@@ -42,7 +39,6 @@ const makeIcon = (name, item) => {
 
   return `
   ${REP_TAG}
-  ${title}
   ${gTag}{ios
   ? ${ios}
   : ${md}
@@ -64,7 +60,7 @@ export default ${temp}
 
   const parm = typeof item === 'string' ? '' : ', ios?: boolean'
   const icon = `import React = require('react')
-export default (props: object${parm}) =>${makeIcon(name, item)}</svg>
+export default (props: object, iconTitle: string${parm}) =>${makeIcon(name, item)}</svg>
 `
   iconWrite(`${name}.tsx`, icon)
 }
@@ -121,6 +117,7 @@ const writeFiles = (info, count) => {
     createTSX(name, item)
   })
 
+  makeTitles(names)
   makeTypings(names, count)
   makeBundle('all', names, () => true)
   makeBundle('logos', names, (e) => e.startsWith('logo-'))
