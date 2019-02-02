@@ -11,6 +11,7 @@
 
 - Minor refactorization to the main component, cleanup.
 - Makes `IonIconProp` generic, to allow custom icon names.
+- Split generator script.
 
 ### Fixed
 

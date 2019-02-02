@@ -19,6 +19,7 @@
   "scripts": {
     "build:icons": "node ./scripts/make-svg-icons && tsc -P ./tsicons.json && rimraf ./icons/*.tsx",
     "build:index": "tsc",
+    "build:types": "node ./scripts/run-types",
     "build": "yarn clean && yarn build:icons && yarn build:index",
     "clean": "rimraf ./bundles/* ./icons/* index.*",
     "test": "echo Only use it."

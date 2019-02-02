@@ -1,43 +1,17 @@
-const fs = require('fs')
-const getPackageVersion = require('@jsbits/get-package-version')
-const { camelize, ensurePath, formatDate, ROOT_DIR } = require('./utils')
+const makeTypings = require('./make-typings')
+const readSvgFiles = require('./read-svg-files')
+const { camelize, ensurePath, distWrite, iconWrite, formatDate } = require('./utils')
+const { IDX_IOS, IDX_MD, PREFIX, ICON_FOLDER, DIST_FOLDER } = require('./constants')
 
-// Editar este PREFIX si ionic cambia el formato
-const PREFIX  = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">'
 const REP_TAG = PREFIX.slice(0, -1) + ' {...props}>'
-const IDX_IOS = 0
-const IDX_MD  = 1
 
-// Valid ionicon prefixes
-const ICON_PREFIXES = ['ios', 'md', 'logo']
-
-const IONICONS = `${ROOT_DIR}/node_modules/ionicons/dist/collection/icon/svg`
-const DIST_DIR = `${ROOT_DIR}/bundles`
-const ICON_DIR = `${ROOT_DIR}/icons`
-
-ensurePath('bundles')
-ensurePath('icons')
+ensurePath(DIST_FOLDER)
+ensurePath(ICON_FOLDER)
 
 /**
  * @typedef {{ [k: string]: string | [string, string] }} SvgPathInfo
  * @typedef {(e: string) => boolean} FilterFn
  */
-
-/**
- * Write the content to a file into the "dist" folder
- * @param {string} name
- * @param {string} content
- */
-const distWrite = (name, content) =>
-  fs.writeFileSync(`${DIST_DIR}/${name}`, content, 'utf8')
-
-/**
- * Write the content to a file into the "icons" folder
- * @param {string} name
- * @param {string} content
- */
-const iconWrite = (name, content) =>
-  fs.writeFileSync(`${ICON_DIR}/${name}`, content, 'utf8')
 
 /**
  * Take care of icons with multiple paths, must not close the `<svg>` tag
@@ -90,26 +64,6 @@ export default (props: object${parm}) =>${makeIcon(name, item)}</svg>
 }
 
 /**
- * Creates the typings.
- * @param {string[]} names
- * @param {[number, number]} count
- */
-const makeTypings = (names, count) => {
-  const data = {
-    'names': names.map((e) => `  | '${e}'`).join('\n'),
-    'package-version': getPackageVersion(),
-    'ionicon-version': getPackageVersion(IONICONS),
-    'dual-icons': count[0],
-    'logo-icons': count[1],
-    'date': new Date().toJSON().substr(0, 19) + 'Z',
-  }
-  const text = fs.readFileSync(`${__dirname}/index.d.ts.template`, 'utf8')
-    .replace(/@\{([-a-z]+)\}/g, (match, name) => data[name] || match)
-
-  fs.writeFileSync(`${ROOT_DIR}/index.d.ts`, text, 'utf8')
-}
-
-/**
  * Creates an export of icons
  * @param {string} name
  * @param {string[]} icons
@@ -117,8 +71,8 @@ const makeTypings = (names, count) => {
  */
 const makeBundle = (name, icons, filter) => {
   icons = icons.filter(filter)
-
-  const exp = icons.map((e) => `  '${e}': require('../icons/${e}').default,`).join('\n')
+  const src = ICON_FOLDER
+  const exp = icons.map((e) => `  '${e}': require('../${src}/${e}').default,`).join('\n')
   const dts = icons.map((e) => `  '${e}': SVGIcon`).join('\n')
 
   const text = `"use strict";
@@ -140,20 +94,6 @@ ${dts}
 `
   distWrite(`${name}.d.ts`, type)
   distWrite(`${name}.js`, text)
-}
-
-/**
- * Reads and parses a SVG file from ionicons
- * @param {string} file
- */
-const parseSvg = (file) => {
-  const text = fs.readFileSync(file, 'utf8').trim()
-
-  if (text.startsWith(PREFIX)) {
-    return text.substr(PREFIX.length).replace(/<\/svg>\s*$/, '')
-  }
-
-  throw new Error(`The file ${file} does not have the required format.`)
 }
 
 /**
@@ -185,42 +125,9 @@ const writeFiles = (info, count) => {
  * Read the whole ionicons "svg" folder
  * @param {string} inDir
  */
-const buildAll = (inDir) => {
-  /** @type {SvgPathInfo} */
-  const info  = {}
-  const list  = fs.readdirSync(inDir, 'utf8')
-  const count = [0, 0]
-  inDir += '/'
-
-  list.filter((file) => file.endsWith('.svg')).forEach((file) => {
-    let name = file.slice(0, -4) // remove extension
-
-    // First two are the 'ios' and 'md' prefixes
-    const idx = ICON_PREFIXES.indexOf(name.split('-').shift())
-    if (idx < 0) {
-      console.log(`Ignored: ${file}`)
-      return
-    }
-
-    file = inDir + file
-
-    if (idx >= 2) {
-      info[name] = parseSvg(file)
-      count[1]++
-
-    } else {
-      name = name.substr(name.indexOf('-') + 1)
-      // @ts-ignore
-      const elem = info[name] || (info[name] = [])
-
-      elem[idx] = parseSvg(file)
-      count[0] += idx // 0 or 1
-    }
-  })
-
-  console.log(`Readed ${count[0]} dual-mode icons, ${count[1]} logo icons.`)
-
-  return writeFiles(info, count)
+const buildAll = () => {
+  const result = readSvgFiles()
+  writeFiles(result.info, result.count)
 }
 
-buildAll(IONICONS)
+buildAll()
