@@ -34,6 +34,15 @@ module.exports = {
   },
 
   /**
+   * Convert a string from 'kebab-case' to 'Title Case'
+   * @param {string} str
+   */
+  kebabToTitle (str) {
+    return str[0].toUpperCase() +
+      str.substr(1).replace(/-+([a-z])/g, (_, c) => ` ${c.toUpperCase()}`)
+  },
+
+  /**
    * Format the date & time
    * @param {Date} [date]
    */

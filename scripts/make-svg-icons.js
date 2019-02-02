@@ -1,5 +1,6 @@
 const makeTypings = require('./make-typings')
 const readSvgFiles = require('./read-svg-files')
+const iconTagTitle = require('./icon-tag-title')
 const { camelize, ensurePath, distWrite, iconWrite, formatDate } = require('./utils')
 const { IDX_IOS, IDX_MD, PREFIX, ICON_FOLDER, DIST_FOLDER } = require('./constants')
 
@@ -19,10 +20,12 @@ ensurePath(ICON_FOLDER)
  * @param {string | string[]} item
  */
 const makeIcon = (name, item) => {
+  const title = iconTagTitle(name)
+
   const gTag = `<g className="ion-${name}">`
 
   if (typeof item === 'string') {
-    return `\n${REP_TAG}\n${gTag}">\n${item}\n</g>`
+    return `\n${REP_TAG}\n${title}${gTag}\n${item}\n</g>`
   }
 
   const ios = item[IDX_IOS].replace(/>\s+</g, '')
@@ -30,13 +33,16 @@ const makeIcon = (name, item) => {
 
   if (~ios.indexOf('><') || ~md.indexOf('><')) {
     return `
-  ${REP_TAG}{ios
+  ${REP_TAG}
+  ${title}
+  {ios
   ? ${gTag}${ios}</g>
   : ${gTag}${md}</g>}`
   }
 
   return `
   ${REP_TAG}
+  ${title}
   ${gTag}{ios
   ? ${ios}
   : ${md}

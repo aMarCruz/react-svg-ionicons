@@ -6,6 +6,7 @@
 
 - Ko-fi link.
 - [MarkdownLint](https://www.npmjs.com/package/markdownlint) rules.
+- Title element for icons, defaults to the Title Case of their names.
 
 ### Changed
 
