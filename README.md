@@ -212,6 +212,7 @@ This setting has no default value, but a common one is "icon".
 
 ## TODO
 
+- [ ] Tests.
 - [ ] SVG Sprites.
 - [ ] Custom bundle generator.
 - [ ] Examples.

@@ -220,7 +220,7 @@ var IonIcon = /** @class */ (function (_super) {
         // Add inconditionally the base class, if any.
         var classes = _Conf.baseClass;
         if (classes) {
-            props.className = props.className ? classes + " " + defs.className : classes;
+            props.className = props.className ? classes + " " + props.className : classes;
         }
         return props;
     };
