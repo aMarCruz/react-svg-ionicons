@@ -4,7 +4,7 @@
  * 317 dual-mode icons, 62 logo icons.
  *
  * @auhtor aMarCruz <amarcruzbox-git@yahoo.com>
- * @date 2019-02-01 @ 19:13
+ * @date 2019-02-02T08:09:51Z
  * @license MIT
  */
 import * as React from 'react'
@@ -21,9 +21,9 @@ export interface SVGIcon { (opts: object, ios?: boolean): JSX.Element }
 /**
  * IonIcon class properties and attributes.
  */
-export interface IonIconProps extends React.ClassAttributes<IonIcon>,
-  Omit<React.SVGAttributes<SVGSVGElement>, 'xmlns' | 'viewBox' | 'children'> {
-  name: IconNames
+export interface IonIconProps<T extends string> extends
+    Omit<React.SVGAttributes<SVGSVGElement>, 'xmlns' | 'viewBox' | 'children'> {
+  name: T
   color?: string
   size?: string | number
   mode?: 'ios' | 'md'
@@ -43,7 +43,7 @@ export type CustomIconMap = { [k: string]: SVGIcon | null | undefined }
 /**
  * Possible defaults
  */
-export interface IonIconDefs extends Omit<IonIconProps, 'name' | 'innerRef'> {
+export interface IonIconDefs extends Omit<IonIconProps<''>, 'name' | 'innerRef'> {
 }
 
 /**
@@ -54,7 +54,7 @@ export type IonIconSizes = { [k: string]: string | number | undefined }
 /**
  * Main component to render a SVG ionicon.
  */
-export declare class IonIcon extends React.PureComponent<IonIconProps> {
+export declare class IonIcon extends React.PureComponent<IonIconProps<IconNames>> {
 }
 
 /**

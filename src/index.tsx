@@ -1,11 +1,11 @@
 import React = require('react')
 import PropTypes = require('prop-types')
 import invariant = require('invariant')
-import { IconMap, IonIconDefs, IonIconProps, IonIconSizes } from '..'
+import { IconMap, IonIconDefs, IonIconProps, IonIconSizes, IconNames } from '..'
 
 type Dict<T = any> = { [k: string]: T }
 
-type IconProps = IonIconProps
+type IconProps = IonIconProps<IconNames>
 type IonConf = {
   map: IconMap,
   defs: IonIconDefs,
