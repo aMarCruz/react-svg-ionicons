@@ -12,6 +12,7 @@ type IonConf = {
   defs: IonIconDefs,
   sizes: IonIconSizes,
   titles: Dict<string>,
+  baseClass: string | undefined,
 }
 
 const UNDEF = undefined
@@ -87,6 +88,7 @@ const _Conf: IonConf = {
     large: '32px',
   },
   titles: iconTitles,
+  baseClass: UNDEF,
 }
 
 /**
@@ -137,11 +139,21 @@ export const setSizes = function (sizes: IonIconSizes) {
 /**
  * Add icon titles to the icon-name -> title transtations.
  *
- * @param {Object.<string,?string>} sizes Object with a sizes map.
+ * @param {Object.<string,?string>} sizes Object with {icon-name: title} props.
  */
 export const setTitles = function (iconTitles: Dict<string | null>) {
   invariant(isObject(iconTitles), 'The icon titles must be an object.')
   pack(assign(_Conf.titles, iconTitles))
+}
+
+/**
+ * Class or space separated classes to add to the `className` property
+ * of all the icons, in addition to the default or specific one.
+ *
+ * @param {string} class or space separated list of classes.
+ */
+export const setBaseClass = function (classes: string) {
+  _Conf.baseClass = classes && classAsStr(classes).trim() || UNDEF
 }
 
 /**
@@ -210,15 +222,15 @@ export class IonIcon extends React.PureComponent<IconProps> {
 
       switch (k) {
         case 'className':
-          props.className = props.className
-            ? `${classAsStr(props.className)} ${defs.className}`
-            : defs.className
+          if (props.className === UNDEF) {
+            props.className = defs.className
+          }
           break
 
         case 'style':
-          props.style = props.style
-            ? assign(assign({}, props.style), defs.style)
-            : defs.style
+          if (props.style === UNDEF) {
+            props.style = assign({}, defs.style)
+          }
           break
 
         case 'color':
@@ -234,6 +246,12 @@ export class IonIcon extends React.PureComponent<IconProps> {
             props[k] = defs[k]
           }
       }
+    }
+
+    // Add inconditionally the base class, if any.
+    const classes = _Conf.baseClass
+    if (classes) {
+      props.className = props.className ? `${classes} ${props.className}` : classes
     }
 
     return props

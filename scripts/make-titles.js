@@ -27,7 +27,7 @@ const fixes = {
 /**
  * @param {string} name
  */
-const toTitle = (name) => `  '${name}': '${fixes[name] || kebabToTitle(name)}',\n`
+const toTitle = (name) => `  '${name}': '${fixes[name] || kebabToTitle(name)}',`
 
 /**
  * Creates the /index.d.ts file with the package typings.
@@ -36,6 +36,15 @@ const toTitle = (name) => `  '${name}': '${fixes[name] || kebabToTitle(name)}',\
  * @param {[number, number]} count
  */
 module.exports = function makeTitles (names) {
-  const text = `module.exports = {\n${names.map(toTitle).join('')}}\n`
+
+  const text = `/**
+ * Default icon-name -> title translations.
+ * @type {{[k: string]: string}}
+ */
+module.exports = {
+${names.map(toTitle).join('\n')}
+}
+`
+
   distWrite('icon-titles.js', text)
 }

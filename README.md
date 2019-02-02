@@ -11,9 +11,7 @@ From the [Ionicon site](https://ionicons.com/)
 
 react-svg-ionicons exports an `IonIcon` component, similar to the Ionic's `ion-icon` Web Component, to render SVG icons in web pages with automatic detection of the icon style (iOS or Material Design) based on your platform.
 
-_**WARNING:** Folders "bundle" and "icon" now are "bundles" and "icons" and the `iconType` property is `mode`, for consistency with the ion-icon Web Component._
-
-_This is **WIP** and breaking changes are expected. I hope to stabilize the API in v0.3.0._
+**WARNING:** _This package is **WIP**, so breaking changes are expected. Please check the [Changelog](CHANGELOG.md) for more information. The API will stabilize in v0.3.0_
 
 Thanks to the [Ionic Framework](https://ionicframework.com/) team for their awesome work!
 
@@ -27,7 +25,7 @@ $ npm i react-svg-ionicons -S
 
 ## Usage
 
-This package consists of one component, three utility functions and ~380 subcomponents with dual and logo icons, covering the entire set of the Ionicons.
+This package consists of one component, some utility functions and ~380 subcomponents with dual and logo icons, covering the entire set of the Ionicons.
 
 Before using the main `IonIcon` component, you must add subcomponents (`SVGIcon`) through the `addIcons` function.
 
@@ -37,7 +35,7 @@ I include three convenience bundles in the folder "bundles":
 - `generic` : All the dual icons.
 - `logos` : Only the "logo" icons.
 
-```ts
+```jsx
 import { IonIcon, addIcons } from 'react-svg-ionicons'
 import bundle from 'react-svg-ionicons/bundles/all'
 
@@ -54,7 +52,18 @@ In addition to the styles and classes that you define (applied to the `<svg>` ta
 
 ## API
 
-### `<IonIcon>`
+- [IonIcon](#ionicon)
+- [addIcons](#addicons)
+- [setDefaults](#setdefaults)
+- [setSizes](#setsizes)
+- [setTitles](#settitles)
+- [setBaseClass](#setbaseclass)
+
+### `IonIcon`
+
+```jsx
+<IonIcon name="icon-name" {...props} />
+```
 
 This is the main component of react-svg-ionicons and will render an unwrapped `<svg>` with the default and instance properties.
 
@@ -85,6 +94,10 @@ IonIcon accepts almost any valid SVG attribute in (react) _camel-case_ notation,
   The `mode` property determines which platform styles to use, either `"ios"` or `"md"`.
 
   By using this property you will override the automatic detection of the platform.
+
+- **title**
+
+  Overrides the default title of the icon (the default is the icon name in _Title Case_).
 
 - **innerRef**
 
@@ -129,9 +142,11 @@ setDefaults(settings: SVGAttributes<SVGSVGElement>): void
 
 This function accepts a JS object with valid SVG attributes that are mixed with the defaults used when rendering the icons.
 
-Deep merge is only applied to `className` and `style`, and the attributes `xmlns` y `viewBox` are ignored, the rest are accepted but may have no effect on the icon. You will need to experiment to get the desired effect.
+Deep merge is only applied to objects like `style`, and the attributes `xmlns` y `viewBox` are ignored.
 
-To remove an existing attribute, pass `null` or `undefined` as its value.
+Even if an attribute is accepted, it may have no effect on the icon. You will need to experiment to get the desired effect.
+
+To remove existing attributes, pass `null` or `undefined` as its value.
 
 Predefined values:
 
@@ -174,6 +189,32 @@ You can use this values through the `size` property of IonIcon:
 ```
 
 The value will be applied to the `width` and `height` attributes of the `<svg>` element.
+
+### setTitles
+
+```ts
+setTitles(iconTitles: { [k: string]: string | null })
+```
+
+This function allows you configure the default icon-name -&gt; title translations.
+
+In accordance with the [accessibility recommendations](https://www.w3.org/TR/svg-aam-1.0/#include_elements) each icon includes a `<title>` element. By default it is the name of the icon in title-case.
+
+### setBaseClass
+
+```ts
+setBaseClass(classes: string | null)
+```
+
+Determines the base class that will be added to the default or specific `className` property to form the final `class` attribute for all the icons.
+
+This setting has no default value, but a common one is "icon".
+
+## TODO
+
+- [ ] SVG Sprites.
+- [ ] Custom bundle generator.
+- [ ] Examples.
 
 ## Support my Work
 

@@ -7,12 +7,15 @@
 - Ko-fi link.
 - [MarkdownLint](https://www.npmjs.com/package/markdownlint) rules.
 - Title element for icons, defaults to the Title Case of their names.
+- Utility functions `setTitle` and `setBaseClass`.
 
 ### Changed
 
 - Minor refactorization to the main component, cleanup.
 - Makes `IonIconProp` generic, to allow custom icon names.
 - Split generator script.
+- Unlike `setDefaults` that merge objects, Specific properties like `style` will override the default.
+- New `baseClass` setting to add classes to the final `className` property.
 
 ### Fixed
 

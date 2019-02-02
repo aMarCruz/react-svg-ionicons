@@ -1,2 +1,2 @@
-declare const iconTitles: { [k: string]: string }
-export = iconTitles
+declare const iconTitle: { [k: string]: string }
+export = iconTitle
