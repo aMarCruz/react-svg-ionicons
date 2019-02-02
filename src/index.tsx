@@ -1,11 +1,11 @@
 import React = require('react')
 import PropTypes = require('prop-types')
 import invariant = require('invariant')
-import { IconMap, IonIconDefs, IonIconProps, IonIconSizes, Nullable } from '..'
+import { IconMap, IonIconDefs, IonIconProps, IonIconSizes } from '..'
 
 type Dict<T = any> = { [k: string]: T }
-type Merge<T> = { [K in keyof T]: T[K] }
 
+type IconProps = IonIconProps
 type IonConf = {
   map: IconMap,
   defs: IonIconDefs,
@@ -32,7 +32,7 @@ const isObject = (obj: any) => !!obj && typeof obj === 'object'
 /**
  * Simple `Object.assign`-like function
  */
-const assign = function<T extends Dict, U extends Dict> (dest: T, src: U) {
+const assign = function<T extends Dict, U extends Dict> (dest: T, src?: U) {
   dest = dest || {}
   if (src) {
     Object.keys(src).forEach((k) => {
@@ -41,7 +41,7 @@ const assign = function<T extends Dict, U extends Dict> (dest: T, src: U) {
         : src[k]
     })
   }
-  return dest as Merge<T & U>
+  return dest as (T & U)
 }
 
 /**
@@ -55,7 +55,7 @@ const pack = <T extends Dict> (obj: T) => {
       obj[k] = pack(obj[k])
     }
   })
-  return obj
+  return obj as T
 }
 
 /**
@@ -93,7 +93,7 @@ const _Conf: IonConf = {
  *
  * @param {Object.<string,?Function>} iconMap Object with name-icon translations.
  */
-export const addIcons = function (iconMap: Nullable<IconMap>) {
+export const addIcons = function (iconMap: IconMap) {
   invariant(isObject(iconMap), 'The iconMap must be an object.')
   pack(assign(_Conf.map, iconMap))
 }
@@ -105,7 +105,7 @@ export const addIcons = function (iconMap: Nullable<IconMap>) {
  *
  * @param {Object.<string,*>} defaults Properties to merge.
  */
-export const setDefaults = function (defaults: Nullable<IonIconDefs>) {
+export const setDefaults = function (defaults: IonIconDefs) {
   invariant(isObject(defaults), 'The defaults must be an object.')
   const defs = assign(_Conf.defs, defaults)
 
@@ -126,37 +126,36 @@ export const setDefaults = function (defaults: Nullable<IonIconDefs>) {
  *
  * @param {Object.<string,?string|number>} sizes Object with a sizes map.
  */
-export const setSizes = function (sizes: Nullable<IonIconSizes>) {
+export const setSizes = function (sizes: IonIconSizes) {
   invariant(isObject(sizes), 'The sizes must be an object.')
   pack(assign(_Conf.sizes, sizes))
-}
-
-const expandFrom = {
-  color: ['fill', 'stroke'],
-  size: ['width', 'height'],
 }
 
 /**
  * Renders a SVG Ionicon
  */
-export class IonIcon extends React.PureComponent<IonIconProps> {
+export class IonIcon extends React.PureComponent<IconProps> {
 
-  static propTypes = {
-    name: PropTypes.string.isRequired,
-    color: PropTypes.string,
-    size: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    mode: PropTypes.oneOf(['ios', 'md']),
-    innerRef: PropTypes.func,
+  static propTypes: object
+
+  expandColor(opts: Dict, color?: string) {
+    if (opts.fill === UNDEF) {
+      opts.fill = color
+    }
+    if (opts.stroke === UNDEF) {
+      opts.stroke = color
+    }
   }
 
-  expandAttr(opts: Dict, name: keyof typeof expandFrom, value: any) {
-    const [p1, p2] = expandFrom[name]
-
-    if (opts[p1] === UNDEF) {
-      opts[p1] = value
+  expandSize(opts: Dict, size?: string | number) {
+    if (typeof size === 'string') {
+      size = _Conf.sizes[size] || size
     }
-    if (opts[p2] === UNDEF) {
-      opts[p2] = value
+    if (opts.width === UNDEF) {
+      opts.width = size
+    }
+    if (opts.height === UNDEF) {
+      opts.height = size
     }
   }
 
@@ -164,20 +163,18 @@ export class IonIcon extends React.PureComponent<IonIconProps> {
    * Merge the user properties with the defaults, taking care to preserve
    * the classes and styles of both.
    */
-  mergeDefs(props: IonIconProps) {
+  mergeDefs(props: IconProps) {
     const defs = _Conf.defs
     const keys = keyArray(defs)
 
-    // Example of precedence [fill, stroke] = troke:
-    // fill = user.fill -> defs.fill -> user.color -> defs.color
-    // even if any of them is `null`, it will overrite.
-    debugger
-
+    // Give preference to specific color/size.
     if (props.color !== UNDEF) {
-      this.expandAttr(props, 'color', props.color)
+      this.expandColor(props, props.color)
+      delete props.color
     }
     if (props.size !== UNDEF) {
-      this.expandAttr(props, 'size', props.size)
+      this.expandSize(props, props.size)
+      delete props.size
     }
 
     for (let i = 0; i < keys.length; i++) {
@@ -192,13 +189,16 @@ export class IonIcon extends React.PureComponent<IonIconProps> {
 
         case 'style':
           props.style = props.style
-            ? assign(assign({}, props.style), defs.style!)
+            ? assign(assign({}, props.style), defs.style)
             : defs.style
           break
 
         case 'color':
+          this.expandSize(props, defs.color)
+          break
+
         case 'size':
-          this.expandAttr(props, k, defs[k])
+          this.expandSize(props, defs.size)
           break
 
         default:
@@ -212,17 +212,17 @@ export class IonIcon extends React.PureComponent<IonIconProps> {
   }
 
   render() {
-    const opts = assign({}, this.props) as Merge<IonIconProps>
+    const opts = assign({}, this.props) as IconProps
     const name = opts.name
     delete opts.name
 
     const renderIcon = _Conf.map[name]!
-    invariant(renderIcon, `The icon "${name}" is not registered.`)
+    invariant(renderIcon, 'The icon "%s" is not registered.', name)
 
     const innerRef = opts.innerRef
     if (innerRef !== null) {
       delete opts.innerRef
-      opts.ref = innerRef as any
+      ;(opts as any).ref = innerRef
     }
 
     // name & innerRef are out, merge with defaults before color & size
@@ -237,4 +237,13 @@ export class IonIcon extends React.PureComponent<IonIconProps> {
 
     return renderIcon(opts, ios)
   }
+}
+
+IonIcon.propTypes = {
+  name: PropTypes.string.isRequired,
+  color: PropTypes.string,
+  size: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  mode: PropTypes.oneOf(['ios', 'md']),
+  innerRef: PropTypes.func,
+  children: PropTypes.oneOf([undefined])
 }

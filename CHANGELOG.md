@@ -1,13 +1,26 @@
 # react-svg-ionicons Changes
 
+## \[Unreleased]
+
+### Added
+
+- Ko-fi link.
+- [MarkdownLint](https://www.npmjs.com/package/markdownlint) rules.
+
+### Changed
+
+- Minor refactorization to the main component, cleanup.
+
+### Fixed
+
+- The `size` property is not applied.
+
 ## \[0.2.1] - 2019-02-01
 
 ### Changed
 
 - Update Readme.
 - Allows to accept custom names in addIcons (TS typings).
-- Ko-fi link.
-- [MarkdownLint](https://www.npmjs.com/package/markdownlint) rules.
 
 ### Fixed
 

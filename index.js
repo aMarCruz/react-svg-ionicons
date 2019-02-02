@@ -123,10 +123,6 @@ exports.setSizes = function (sizes) {
     invariant(isObject(sizes), 'The sizes must be an object.');
     pack(assign(_Conf.sizes, sizes));
 };
-var expandFrom = {
-    color: ['fill', 'stroke'],
-    size: ['width', 'height'],
-};
 /**
  * Renders a SVG Ionicon
  */
@@ -135,13 +131,23 @@ var IonIcon = /** @class */ (function (_super) {
     function IonIcon() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
-    IonIcon.prototype.expandAttr = function (opts, name, value) {
-        var _a = expandFrom[name], p1 = _a[0], p2 = _a[1];
-        if (opts[p1] === UNDEF) {
-            opts[p1] = value;
+    IonIcon.prototype.expandColor = function (opts, color) {
+        if (opts.fill === UNDEF) {
+            opts.fill = color;
         }
-        if (opts[p2] === UNDEF) {
-            opts[p2] = value;
+        if (opts.stroke === UNDEF) {
+            opts.stroke = color;
+        }
+    };
+    IonIcon.prototype.expandSize = function (opts, size) {
+        if (typeof size === 'string') {
+            size = _Conf.sizes[size] || size;
+        }
+        if (opts.width === UNDEF) {
+            opts.width = size;
+        }
+        if (opts.height === UNDEF) {
+            opts.height = size;
         }
     };
     /**
@@ -151,15 +157,14 @@ var IonIcon = /** @class */ (function (_super) {
     IonIcon.prototype.mergeDefs = function (props) {
         var defs = _Conf.defs;
         var keys = keyArray(defs);
-        // Example of precedence [fill, stroke] = troke:
-        // fill = user.fill -> defs.fill -> user.color -> defs.color
-        // even if any of them is `null`, it will overrite.
-        debugger;
+        // Give preference to specific color/size.
         if (props.color !== UNDEF) {
-            this.expandAttr(props, 'color', props.color);
+            this.expandColor(props, props.color);
+            delete props.color;
         }
         if (props.size !== UNDEF) {
-            this.expandAttr(props, 'size', props.size);
+            this.expandSize(props, props.size);
+            delete props.size;
         }
         for (var i = 0; i < keys.length; i++) {
             var k = keys[i];
@@ -175,8 +180,10 @@ var IonIcon = /** @class */ (function (_super) {
                         : defs.style;
                     break;
                 case 'color':
+                    this.expandSize(props, defs.color);
+                    break;
                 case 'size':
-                    this.expandAttr(props, k, defs[k]);
+                    this.expandSize(props, defs.size);
                     break;
                 default:
                     if (!props.hasOwnProperty(k)) {
@@ -191,7 +198,7 @@ var IonIcon = /** @class */ (function (_super) {
         var name = opts.name;
         delete opts.name;
         var renderIcon = _Conf.map[name];
-        invariant(renderIcon, "The icon \"" + name + "\" is not registered.");
+        invariant(renderIcon, 'The icon "%s" is not registered.', name);
         var innerRef = opts.innerRef;
         if (innerRef !== null) {
             delete opts.innerRef;
@@ -207,13 +214,14 @@ var IonIcon = /** @class */ (function (_super) {
         }
         return renderIcon(opts, ios);
     };
-    IonIcon.propTypes = {
-        name: PropTypes.string.isRequired,
-        color: PropTypes.string,
-        size: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-        mode: PropTypes.oneOf(['ios', 'md']),
-        innerRef: PropTypes.func,
-    };
     return IonIcon;
 }(React.PureComponent));
 exports.IonIcon = IonIcon;
+IonIcon.propTypes = {
+    name: PropTypes.string.isRequired,
+    color: PropTypes.string,
+    size: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    mode: PropTypes.oneOf(['ios', 'md']),
+    innerRef: PropTypes.func,
+    children: PropTypes.oneOf([undefined])
+};
