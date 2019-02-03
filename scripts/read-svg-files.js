@@ -18,21 +18,27 @@ const parseSvg = (file) => {
 }
 
 /**
+ * @typedef {{ [k: string]: string | [string, string] }} SvgPathInfo
+ * @typedef {[number, number]} CountInfo
+ */
+
+/**
  * Read the whole ionicons "svg" folder
- * @param {string} inDir
  */
 module.exports = function readSvgFiles () {
-  /** @type {Object.<string,string>} */
+  /** @type {SvgPathInfo} */
   const info  = {}
-  const list  = fs.readdirSync(IONIC_SVG_PATH, 'utf8')
+  /** @type {CountInfo} */
   const count = [0, 0]
+
+  const list  = fs.readdirSync(IONIC_SVG_PATH, 'utf8')
   const inDir = IONIC_SVG_PATH + '/'
 
   list.filter((file) => file.endsWith('.svg')).forEach((file) => {
     let name = file.slice(0, -4) // remove extension
 
     // First two are the 'ios' and 'md' prefixes
-    const idx = ICON_PREFIXES.indexOf(name.split('-').shift())
+    const idx = ICON_PREFIXES.indexOf(name.split('-').shift() || '')
     if (idx < 0) {
       console.log(`Ignored: ${file}`)
       return
@@ -46,6 +52,7 @@ module.exports = function readSvgFiles () {
 
     } else {
       name = name.substr(name.indexOf('-') + 1)
+      /** @type {string[]} */
       // @ts-ignore
       const elem = info[name] || (info[name] = [])
 

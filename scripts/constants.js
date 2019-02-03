@@ -24,7 +24,6 @@ module.exports = {
 
   /**
    * Valid ionicon prefixes. readSvgFiles depends on this order.
-   * @type {['ios', 'md', 'logo']}
    */
   ICON_PREFIXES: ['ios', 'md', 'logo'],
 }

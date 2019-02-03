@@ -1,6 +1,7 @@
 const { distWrite } = require('./utils')
 const { kebabToTitle } = require('./utils')
 
+/** @type {{[k:string]:string}} */
 const fixes = {
   'fastforward': 'Fast fordward',
   'qr-scanner': 'QR Scanner',
@@ -25,6 +26,8 @@ const fixes = {
 }
 
 /**
+ * Convert to TitleCase
+ *
  * @param {string} name
  */
 const toTitle = (name) => `  '${name}': '${fixes[name] || kebabToTitle(name)}',`
@@ -33,7 +36,6 @@ const toTitle = (name) => `  '${name}': '${fixes[name] || kebabToTitle(name)}',`
  * Creates the /index.d.ts file with the package typings.
  *
  * @param {string[]} names
- * @param {[number, number]} count
  */
 module.exports = function makeTitles (names) {
 

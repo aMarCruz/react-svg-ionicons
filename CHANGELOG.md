@@ -2,6 +2,10 @@
 
 ## \[Unreleased]
 
+### Added
+
+- TS checking to scripts.
+
 ### Changed
 
 - Allow defaults to override specific `undefined` properties.

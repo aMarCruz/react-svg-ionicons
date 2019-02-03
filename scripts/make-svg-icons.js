@@ -126,7 +126,6 @@ const writeFiles = (info, count) => {
 
 /**
  * Read the whole ionicons "svg" folder
- * @param {string} inDir
  */
 const buildAll = () => {
   const result = readSvgFiles()

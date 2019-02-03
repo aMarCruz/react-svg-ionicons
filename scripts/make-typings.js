@@ -9,12 +9,13 @@ const { IONIC_SVG_PATH, ROOT_DIR } = require('./constants')
  * @param {[number, number]} count
  */
 module.exports = function makeTypings (names, count) {
+  /** @type {{[k:string]:string}} */
   const data = {
     'names': names.map((e) => `  | '${e}'`).join('\n'),
     'package-version': getPackageVersion(),
     'ionicon-version': getPackageVersion(IONIC_SVG_PATH),
-    'dual-icons': count[0],
-    'logo-icons': count[1],
+    'dual-icons': '' + count[0],
+    'logo-icons': '' + count[1],
     'date': new Date().toJSON().substr(0, 19) + 'Z',
   }
   const text = fs.readFileSync(`${__dirname}/index.d.ts.template`, 'utf8')

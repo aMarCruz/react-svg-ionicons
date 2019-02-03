@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": true,
+    "target": "es6",
+    "module": "commonjs",
+    "jsx": "react",
+    "noEmit": true,
+    "strict": true,
+    "moduleResolution": "node"
+  },
+  "include": [
+    "*.js"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
