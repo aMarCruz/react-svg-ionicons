@@ -119,19 +119,28 @@ Also, if you want to reduce the size of your App, you can create a custom bundle
 
 To remove an already loaded icon, pass `null` as its value.
 
-Example:
+Example using TypeScript:
 
 ```js
-import { addIcons } from 'react-svg-ionicons'
+import { addIcons, IonIcon } from 'react-svg-ionicons'
 import alarm from 'react-svg-ionicons/icons/alarm'
 import trash from 'react-svg-ionicons/icons/trash'
 import arrowBack from 'react-svg-ionicons/icons/arrow-back'
 
-addIcons({
-  'alarm': alarm,
-  'trash': trash,
-  'back': arrowBack,
-})
+const bundle = {
+  alarm,
+  trash,
+  back: arrowBack,
+}
+
+type IconNames = keyof typeof bundle
+
+addIcons(bundle)
+
+interface Icon extends IonIcon<IconNames> {}
+const Icon = IonIcon
+
+export { Icon }
 ```
 
 ### setDefaults

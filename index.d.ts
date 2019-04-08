@@ -77,8 +77,8 @@ export type IonIconSizes = Dict<string | number | undefined>;
 /**
  * Main component to render a SVG ionicon.
  */
-export declare class IonIcon extends React.PureComponent<IonIconProps<IconNames>> {
-}
+interface IonIcon<T extends string = IconNames> {}
+export declare class IonIcon<T> extends React.PureComponent<IonIconProps<T>> {}
 
 /**
  * Merge the given icons with the existent ones.

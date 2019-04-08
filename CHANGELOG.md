@@ -1,10 +1,11 @@
 # react-svg-ionicons Changes
 
-## \[Unreleased]
+## \[0.2.3] - 2019-04-08
 
 ### Added
 
 - TS checking to scripts.
+- Generic interface to restrict IonIcon to certain icon names.
 
 ### Changed
 
