@@ -20,7 +20,7 @@ const UNDEF = undefined
 /**
  * We are running in a Mac-like OS?
  */
-const isMacLike = /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform)
+const isMacLike = /(Mac|iPhone|iPod|iPad)/i.test(navigator && navigator.platform)
 
 /**
  * Shorthand to `Object.keys` that returns a more-sense type.
